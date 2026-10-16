@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "analisador-ssh-mitre"
+version = "0.1.0"
+description = "Analisador de logs SSH com mapeamento de eventos para técnicas MITRE ATT&CK"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Kelvin Oliveira"}]
+keywords = ["ssh", "logs", "mitre", "att&ck", "ciberseguranca"]
+
+[project.scripts]
+analisador-ssh-mitre = "analisador_ssh_mitre.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["analisador_ssh_mitre*"]
