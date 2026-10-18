@@ -1,118 +1,84 @@
+
 # analisador-logs-ssh-mitre
 
-SSH log analyzer that maps events to MITRE ATT&CK techniques. Emits deterministic JSON, ready for consumption by cybersecurity tools.
+![language: Python](https://img.shields.io/badge/language-Python-blue?logo=python)   ![status: done](https://img.shields.io/badge/status-done-green)   ![license: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-Stack: Python, regex, JSON. No external dependencies. Requires Python 3.10 or higher.
+## Summary
+
+Python project developed as a software engineering study. Projeto funcional, analisador-logs-ssh-mitre
+
+## Problem / why it exists
+
+The project addresses a practical scope and automates a task that, done manually, is repetitive and error-prone. The focus is on turning data or processes into reliable output, with readable and testable code.
+
+## Architecture
+
+The code is organized by responsibility:
+
+- Input: reading a file, API, user input or data capture (depending on the module).
+- Processing: pure functions or classes that apply business rules, transformation or analysis over the input data.
+- Output: writing a file, printing to terminal, HTTP response or report generation.
+
+When applicable, the application separates the data access layer from the business logic layer, so changing the data source does not require rewriting the rules.
+
+## Technologies
+
+- Python 3.x
+- (none declared in the repository)
+
+- No CI configured in this repository.
+
+The repository contains automated tests.
 
 ## What it does
 
-Reads SSH log lines (syslog format, `auth.log` or `secure`) and recognizes three patterns:
+Projeto funcional, analisador-logs-ssh-mitre
 
-| Line pattern | Meaning | MITRE technique |
-|---|---|---|
-| `Failed password for invalid user <user> from <ip> port <port> ssh2` | Attempt with nonexistent user | T1110 Brute Force / T1110.001 Password Guessing |
-| `Failed password for <user> from <ip> port <port> ssh2` | Failed password for existing user | T1110 Brute Force / T1110.001 Password Guessing |
-| `Accepted password for <user> from <ip> port <port> ssh2` | Successful password authentication | T1078 Valid Accounts |
+## How to run
 
-Lines that do not match these patterns (for example, `Accepted publickey`, `Connection closed`) are ignored.
+Requirements: Python 3.x installed.
 
-The output is JSON ordered by timestamp, with sorted keys, no execution timestamps and no random values: the same input always produces the same output.
+```
+# install dependencies (if requirements.txt exists)
+pip install -r requirements.txt
 
-## How to use
+# run
+python main.py
 
-Installation:
-
-```bash
-pip install -e .
+# run tests
+pytest
 ```
 
-CLI execution (reads from a file):
+## Project structure
 
-```bash
-python -m analisador_ssh_mitre path/to/auth.log --fonte auth.log
-```
+- src/ (6 arquivo(s))
+- tests/ (4 arquivo(s))
+- .gitignore, BRIEF.md, pyproject.toml, README.en.md, README.md
 
-Or reading from stdin:
 
-```bash
-cat path/to/auth.log | python -m analisador_ssh_mitre --fonte auth.log
-```
+## Trade-offs and decisions
 
-Example JSON output:
+- Standard library whenever possible; external dependencies only when the benefit justifies maintenance.
+- Executable scripts straight away, no complex build step, to ease reproduction.
+- Logic separated from input/output to keep processing functions testable.
 
-```json
-{
-  "events": [
-    {
-      "event_type": "invalid_user",
-      "ip": "192.168.1.10",
-      "port": 22000,
-      "timestamp": "Oct 10 10:23:45",
-      "user": "admin"
-    },
-    {
-      "event_type": "accepted_password",
-      "ip": "10.0.0.5",
-      "port": 51235,
-      "timestamp": "Oct 10 10:23:46",
-      "user": "ubuntu"
-    }
-  ],
-  "source": "auth.log",
-  "techniques": [
-    {
-      "sub_technique_id": "T1110.001",
-      "sub_technique_name": "Password Guessing",
-      "tactic": "Credential Access",
-      "technique_id": "T1110",
-      "technique_name": "Brute Force"
-    },
-    {
-      "sub_technique_id": null,
-      "sub_technique_name": null,
-      "tactic": "Defense Evasion, Persistence, Privilege Escalation, Initial Access",
-      "technique_id": "T1078",
-      "technique_name": "Valid Accounts"
-    }
-  ],
-  "total_events": 2
-}
-```
+## Known limitations
 
-Python API:
+- Limited scope to the described slice; it is not a complete platform.
+- Depends on Python 3.x at runtime.
 
-```python
-from analisador_ssh_mitre import analyze, to_json
-
-with open("auth.log", encoding="utf-8") as f:
-    resultado = analyze(f, source="auth.log")
-print(to_json(resultado))
-```
-
-The `analyze` function accepts an iterable of lines (for example, the list returned by `splitlines()` or the file object itself) and `source` is the source identifier reported in the JSON output.
 
 ## Tests
 
-The project uses `pytest` with synthetic logs. To run:
-
-```bash
-python -m pytest -q
 ```
-
-Expected result: 17 tests approved in 3 modules (`test_parser`, `test_mitre`, `test_analisador`).
-
-## MITRE ATT&CK techniques mapped
-
-| Event | Technique ID | Technique name | Sub-technique | Tactic |
-|---|---|---|---|---|
-| failed_password | T1110 | Brute Force | T1110.001 Password Guessing | Credential Access |
-| invalid_user | T1110 | Brute Force | T1110.001 Password Guessing | Credential Access |
-| accepted_password | T1078 | Valid Accounts | — | Defense Evasion, Persistence, Privilege Escalation, Initial Access |
+pytest
+```
 
 ## License
 
-MIT
+Distributed under the MIT License. See the `LICENSE` file in this repository.
 
 ## Author
 
-Kelvin Oliveira
+Kelvin Oliveira, https://github.com/KelvinOliveiraCode
+Portfolio: https://kelvinoliveiracode.github.io/portfolio/
