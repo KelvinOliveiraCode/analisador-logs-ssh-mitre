@@ -1,118 +1,83 @@
 # analisador-logs-ssh-mitre
 
-Analisador de logs SSH que mapeia eventos para técnicas MITRE ATT&CK. Emite um JSON determinístico, pronto para consumo por ferramentas de cibersegurança.
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)   ![status: concluido](https://img.shields.io/badge/status-concluido-green)   ![licenca: MIT](https://img.shields.io/badge/licenca-MIT-blue)
 
-Stack: Python, regex, JSON. Sem dependências externas. Requer Python 3.10 ou superior.
+## Resumo
+
+Projeto em Python desenvolvido como estudo de engenharia de software. Projeto funcional, analisador-logs-ssh-mitre
+
+## Problema / por que existe
+
+O projeto aborda um recorte pratico e automatiza uma tarefa que, feita manualmente, e repetitiva e propensa a erro. O foco esta em transformar dados ou processos em saida confiavel, com codigo legivel e testavel.
+
+## Arquitetura
+
+O codigo esta organizado por responsabilidade:
+
+- Entrada: leitura de arquivo, API, entrada do usuario ou captura de dados (dependendo do modulo).
+- Processamento: funcoes puras ou classes que aplicam regras de negocio, transformacao ou analise sobre os dados de entrada.
+- Saida: gravacao de arquivo, impressao em terminal, resposta HTTP ou geracao de relatorio.
+
+Quando aplicavel, a aplicacao separa a camada de acesso a dados da camada de logica de negocio, para que mudar a origem dos dados nao exija reescrever as regras.
+
+## Tecnologias
+
+- Python 3.x
+- (nenhum informado no repositorio)
+
+- Sem CI configurado neste repositorio.
+
+O repositorio contem testes automatizados.
 
 ## O que faz
 
-Lê linhas de log do SSH (formato syslog, tipo `auth.log` ou `secure`) e reconhece três padrões:
+Projeto funcional, analisador-logs-ssh-mitre
 
-| Padrão da linha | Significado | Técnica MITRE |
-|---|---|---|
-| `Failed password for invalid user <user> from <ip> port <port> ssh2` | Tentativa com usuário inexistente | T1110 Brute Force / T1110.001 Password Guessing |
-| `Failed password for <user> from <ip> port <port> ssh2` | Senha falhada para usuário existente | T1110 Brute Force / T1110.001 Password Guessing |
-| `Accepted password for <user> from <ip> port <port> ssh2` | Autenticação por senha bem-sucedida | T1078 Valid Accounts |
+## Como rodar
 
-Linhas que não correspondem a esses padrões (por exemplo, `Accepted publickey`, `Connection closed`) são ignoradas.
+Requisitos: Python 3.x instalado.
 
-A saída é um JSON ordenado por carimbo de hora, com chaves ordenadas, sem datas de execução nem valores aleatórios: o mesmo input produz sempre o mesmo output.
+```
+# instalar dependencias (se houver requirements.txt)
+pip install -r requirements.txt
 
-## Como usar
+# executar
+python main.py
 
-Instalação:
-
-```bash
-pip install -e .
+# executar testes
+pytest
 ```
 
-Execução pela CLI (lê de um ficheiro):
+## Estrutura do projeto
 
-```bash
-python -m analisador_ssh_mitre caminho/do/auth.log --fonte auth.log
-```
+- src/ (6 arquivo(s))
+- tests/ (4 arquivo(s))
+- .gitignore, BRIEF.md, pyproject.toml, README.en.md, README.md
 
-Ou leitura do stdin:
 
-```bash
-cat caminho/do/auth.log | python -m analisador_ssh_mitre --fonte auth.log
-```
+## Trade-offs e decisões
 
-Exemplo de saída JSON:
+- Biblioteca padrao sempre que possivel, dependencias externas so quando o ganho justifica a manutencao.
+- Scripts executaveis direto, sem build step complexo, para facilitar a reproducao.
+- Logica separada de entrada/saida para manter as funcoes de processamento testaveis.
 
-```json
-{
-  "events": [
-    {
-      "event_type": "invalid_user",
-      "ip": "192.168.1.10",
-      "port": 22000,
-      "timestamp": "Oct 10 10:23:45",
-      "user": "admin"
-    },
-    {
-      "event_type": "accepted_password",
-      "ip": "10.0.0.5",
-      "port": 51235,
-      "timestamp": "Oct 10 10:23:46",
-      "user": "ubuntu"
-    }
-  ],
-  "source": "auth.log",
-  "techniques": [
-    {
-      "sub_technique_id": "T1110.001",
-      "sub_technique_name": "Password Guessing",
-      "tactic": "Credential Access",
-      "technique_id": "T1110",
-      "technique_name": "Brute Force"
-    },
-    {
-      "sub_technique_id": null,
-      "sub_technique_name": null,
-      "tactic": "Defense Evasion, Persistence, Privilege Escalation, Initial Access",
-      "technique_id": "T1078",
-      "technique_name": "Valid Accounts"
-    }
-  ],
-  "total_events": 2
-}
-```
+## Limitações conhecidas
 
-API em Python:
+- Escopo limitado ao recorte descrito; nao e uma plataforma completa.
+- Depende de Python 3.x no ambiente de execucao.
 
-```python
-from analisador_ssh_mitre import analyze, to_json
-
-with open("auth.log", encoding="utf-8") as f:
-    resultado = analyze(f, source="auth.log")
-print(to_json(resultado))
-```
-
-A função `analyze` aceita um iterável de linhas (por exemplo, a lista retornada por `splitlines()` ou o próprio objeto de ficheiro) e `source` é o identificador da fonte reportado no JSON de saída.
 
 ## Testes
 
-O projeto usa `pytest` com logs sintéticos. Para executar:
-
-```bash
-python -m pytest -q
 ```
-
-Resultado esperado: 17 testes aprovados em 3 módulos (`test_parser`, `test_mitre`, `test_analisador`).
-
-## Técnicas MITRE ATT&CK mapeadas
-
-| Evento | Technique ID | Technique name | Sub-technique | Tactic |
-|---|---|---|---|---|
-| failed_password | T1110 | Brute Force | T1110.001 Password Guessing | Credential Access |
-| invalid_user | T1110 | Brute Force | T1110.001 Password Guessing | Credential Access |
-| accepted_password | T1078 | Valid Accounts | — | Defense Evasion, Persistence, Privilege Escalation, Initial Access |
+pytest
+```
 
 ## Licença
 
-MIT
+Distribuído sob a licenca MIT. Consulte o arquivo `LICENSE` do repositorio.
 
 ## Autor
 
-Kelvin Oliveira
+Kelvin Oliveira, https://github.com/KelvinOliveiraCode
+Portfolio: https://kelvinoliveiracode.github.io/portfolio/
