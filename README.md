@@ -1,118 +1,86 @@
 # analisador-logs-ssh-mitre
 
-<div align="center">
-
 [English](README.en.md) · **Português (Brasil)**
 
-</div>
-
-[![Python 3](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/) [![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikit-learn)](https://scikit-learn.org/) [![pandas](https://img.shields.io/badge/pandas-150458?style=flat-square&logo=pandas)](https://pandas.pydata.org/) [![pytest](https://img.shields.io/badge/pytest-0A9EDC?style=flat-square&logo=pytest)](https://docs.pytest.org/) [![MIT License](https://img.shields.io/badge/License-MIT-f4c430?style=flat-square)](LICENSE)
-
-### Projeto funcional ,  analisador-logs-ssh-mitre
-
----
+[![Python 3](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](#) [![pytest](https://img.shields.io/badge/pytest-17%20testes-0A9EDC?style=flat-square&logo=pytest)](#) [![MIT License](https://img.shields.io/badge/License-MIT-f4c430?style=flat-square)](LICENSE)
 
 ## O que é
 
-Projeto funcional ,  analisador-logs-ssh-mitre
+**Analisador de logs SSH com mapeamento MITRE ATT&CK**: parseia logs de autenticação SSH, extrai **eventos** (login falho, sucesso, desconexão) e mapeia cada um para **técnicas MITRE ATT&CK**. Saída em JSON. É um laboratório educacional de segurança ofensiva/defensiva.
 
----
+## ⚠️ Aviso de uso ético e legal
 
-## Início Rápido
+Use apenas em logs próprios ou com autorização expressa do proprietário. O mapeamento MITRE é educacional — não substitui uma análise forense profissional.
 
-```bash
-# Clone e entre
-git clone https://github.com/KelvinOliveiraCode/<repo>.git
-cd <repo>
+## Status
 
-# Instale dependências
-# Nenhum requirements.txt detectado
+Laboratório educacional funcional e testado (17 testes).
 
-# Execute o projeto
-python main.py
+## Funcionalidades
 
-# Execute os testes
-pytest
+- **Parse de log SSH** (`parser.py`): `parse_line` → `SshEvent` com timestamp, origem, destino, status (Failed/Accepted/Disconnected/Other).
+- **Mapeamento MITRE** (`mitre.py`): `map_event` → `MitreMapping` com técnica, tática e ID associados (ex.: T1110 Brute Force, T1078 Valid Accounts).
+- **Análise** (`analisador.py`): agregar eventos por IP, contar tentativas, gerar resultado em JSON.
+- **CLI**: `analisador-ssh-mitre <arquivo.log>` ou pipe stdin.
+
+## Arquitetura
+
+Pacote `analisador_ssh_mitre` com módulos: `parser` (parse do log), `models` (dataclasses SshEvent/MitreMapping), `mitre` (mapeamento), `analisador` (agregação/JSON).
+
+## Stack
+
+- Python ≥ 3.10, stdlib apenas
+- pytest (dev)
+
+## Estrutura do repositório
+
+```
+analisador-logs-ssh-mitre/
+├── pyproject.toml · BRIEF.md
+├── src/analisador_ssh_mitre/
+│   ├── parser.py     # parse de log SSH
+│   ├── models.py     # dataclasses
+│   ├── mitre.py      # mapeamento MITRE ATT&CK
+│   ├── analisador.py # agregação/JSON
+│   └── __main__.py   # CLI
+├── tests/            # 17 testes
+└── LICENSE           # MIT
 ```
 
-## Como funciona
+## Pré-requisitos e instalação
 
-Estrutura limpa e modular com separação de responsabilidades.
+```bash
+pip install -e .
+```
 
----
+## Como executar
 
-## Capacidades
+```bash
+analisador-ssh-mitre /var/log/auth.log
+cat /var/log/auth.log | analisador-ssh-mitre
+```
 
-| Capacidade | Descrição |
-|------------|-------------|
-| Carregamento de Dados | Auto-download do TensorFlow creditcard.csv (284k transações) com cache local |
-| EDA e Visualização | Distribuição de classes, histogramas de Amount, heatmaps de correlação (matplotlib/seaborn) |
-| Pré-processamento | RobustScaler em Amount/Time, split estratificado, remoção de duplicatas |
-| Balanceamento | SMOTE oversampling (fallback: class_weight="balanced") |
-| Modelagem | LogisticRegression, RandomForest, ExtraTrees com RandomizedSearchCV (StratifiedKFold) |
-| Métricas | Accuracy, Precision, Recall, F1, ROC AUC, Specificity, Confusion Matrix |
-| Seleção | Score ponderado: Recall 40% + F1 30% + Precision 20% + Accuracy 10% |
-| Persistência | Serialização joblib para modelo, scaler e resultados completos |
+## Testes e qualidade
 
+```bash
+PYTHONPATH=src python -m pytest tests/
+# 17 passed
+```
 
----
+## Decisões técnicas e trade-offs
 
+- Parser específico para logs SSH: simples e direto; não cobre syslog genérico nem formatos não padronizados.
+- Stdlib: zero dependências; em troca, sem suporte a regex avançado ou machine learning.
 
+## Limitações conhecidas
 
----
+- Parse específico para logs de autenticação SSH estilo syslog; outros formatos de log não funcionam.
+- O mapeamento MITRE é uma aproximação educacional — a atribuição real depende de contexto adicional.
 
-## Perguntas Frequentes
+## Processo de desenvolvimento
 
-<details>
-<summary><strong>O que é este projeto?</strong></summary>
+Projeto individual de Kelvin Oliveira, construído com agentes de IA orquestrados e revisado pelo autor.
 
-Um estudo/projeto em Python demonstrando conceitos fundamentais.
+## Licença e autor
 
-</details>
-
-<details>
-<summary><strong>Como executar?</strong></summary>
-
-Veja [Início Rápido](#início-rápido) para comandos copiáveis.
-
-</details>
-
-<details>
-<summary><strong>Há testes?</strong></summary>
-
-Nenhum teste automatizado neste repositório.
-
-</details>
-
-<details>
-<summary><strong>Posso usar em produção?</strong></summary>
-
-Este é um **projeto de estudo/portfólio**. Revise e endureça (auth, persistência, monitoramento, etc.) antes de usar em produção.
-
-</details>
-
-
-
----
-
-## Documentação
-
-- **Código-Fonte** ,  Navegue pelo diretório `src/` para detalhes de implementação
-- **Referência da API** ,  Docstrings inline + type hints
-- **Diagrama de Arquitetura** ,  Veja [architecture.mermaid](docs/architecture.mermaid) (se presente)
-- **Changelog** ,  [CHANGELOG.md](CHANGELOG.md) (se presente)
-- **Contribuindo** ,  [CONTRIBUTING.md](CONTRIBUTING.md) (se presente)
-
-## Licença
-
-[MIT](LICENSE) ,  Kelvin Oliveira
-
----
-
-<div align="center">
-
-**Construído com** · Python 3 + scikit-learn + pandas
-
-**Autor** · [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfolio](https://kelvinoliveiracode.github.io/portfolio/)
-
-</div>
+MIT — Copyright (c) 2026 Kelvin Rebelo de Oliveira. Autor: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfólio](https://kelvinoliveiracode.github.io/portfolio/)
